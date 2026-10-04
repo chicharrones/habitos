@@ -36,21 +36,17 @@ jobs:
           cd ios
           pod install
 
-      - name: Build iOS App (Physical Device Unsigned)
-        run: |
-          xcodebuild -workspace ios/Runner.xcworkspace \
-                     -scheme Runner \
-                     -configuration Release \
-                     -sdk iphoneos \
-                     CODE_SIGNING_ALLOWED=NO \
-                     CODE_SIGNING_REQUIRED=NO \
-                     CODE_SIGN_IDENTITY="" \
-                     PROVISIONING_PROFILE_SPEC=""
+      - name: Build iOS Application (Release Unsigned)
+        env:
+          CODE_SIGNING_ALLOWED: "NO"
+          CODE_SIGNING_REQUIRED: "NO"
+          CODE_SIGN_IDENTITY: ""
+        run: flutter build ios --release --no-codesign
 
       - name: Create IPA Package
         run: |
           mkdir -p Payload
-          cp -r build/Release-iphoneos/Runner.app Payload/
+          cp -r build/ios/iphoneos/Runner.app Payload/
           zip -r habitos_ios_app.ipa Payload
 
       - name: Upload iOS App Artifact
