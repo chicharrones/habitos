@@ -38,8 +38,17 @@ class NotificationsHelper {
     const AndroidInitializationSettings initializationSettingsAndroid =
         AndroidInitializationSettings('@mipmap/ic_launcher');
 
+    const DarwinInitializationSettings initializationSettingsDarwin =
+        DarwinInitializationSettings(
+      requestAlertPermission: true,
+      requestBadgePermission: true,
+      requestSoundPermission: true,
+    );
+
     const InitializationSettings initializationSettings = InitializationSettings(
       android: initializationSettingsAndroid,
+      iOS: initializationSettingsDarwin,
+      macOS: initializationSettingsDarwin,
     );
 
     await flutterLocalNotificationsPlugin.initialize(
@@ -48,7 +57,7 @@ class NotificationsHelper {
       onDidReceiveBackgroundNotificationResponse: notificationTapBackground,
     );
 
-    // Create high importance notification channel
+    // Create high importance notification channel for Android
     const AndroidNotificationChannel channel = AndroidNotificationChannel(
       channelId,
       channelName,
@@ -66,8 +75,7 @@ class NotificationsHelper {
 
   static Future<bool> requestPermissions() async {
     final statusNotif = await Permission.notification.request();
-    final statusExact = await Permission.scheduleExactAlarm.request();
-    return statusNotif.isGranted && statusExact.isGranted;
+    return statusNotif.isGranted;
   }
 
   static Future<void> openBatteryOptimizationSettings() async {
@@ -174,6 +182,11 @@ class NotificationsHelper {
             showsUserInterface: false,
           ),
         ],
+      ),
+      iOS: DarwinNotificationDetails(
+        presentAlert: true,
+        presentBadge: true,
+        presentSound: true,
       ),
     );
   }

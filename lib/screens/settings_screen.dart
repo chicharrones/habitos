@@ -137,7 +137,7 @@ class SettingsScreen extends StatelessWidget {
                 ListTile(
                   leading: const Icon(Icons.notifications_active),
                   title: const Text('Permisos de Notificaciones'),
-                  subtitle: const Text('Solicitar o verificar permisos de notificaciones exactas'),
+                  subtitle: const Text('Solicitar o verificar permisos de notificaciones'),
                   onTap: () async {
                     final granted = await NotificationsHelper.requestPermissions();
                     if (context.mounted) {
@@ -153,13 +153,15 @@ class SettingsScreen extends StatelessWidget {
                     }
                   },
                 ),
-                const Divider(height: 1),
-                ListTile(
-                  leading: const Icon(Icons.battery_saver),
-                  title: const Text('Optimización de Batería'),
-                  subtitle: const Text('Excluir la app para asegurar la llegada puntual de alarmas'),
-                  onTap: () => NotificationsHelper.openBatteryOptimizationSettings(),
-                ),
+                if (Platform.isAndroid) ...[
+                  const Divider(height: 1),
+                  ListTile(
+                    leading: const Icon(Icons.battery_saver),
+                    title: const Text('Optimización de Batería'),
+                    subtitle: const Text('Excluir la app para asegurar la llegada puntual de alarmas'),
+                    onTap: () => NotificationsHelper.openBatteryOptimizationSettings(),
+                  ),
+                ],
               ],
             ),
           ),
