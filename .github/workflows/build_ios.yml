@@ -36,21 +36,37 @@ jobs:
           cd ios
           pod install
 
-      - name: Build iOS Application (Release Unsigned)
-        env:
-          CODE_SIGNING_ALLOWED: "NO"
-          CODE_SIGNING_REQUIRED: "NO"
-          CODE_SIGN_IDENTITY: ""
-        run: flutter build ios --release --no-codesign
+      - name: Build iOS App Bundle (Simulator Unsigned)
+        run: flutter build ios --simulator
+
+      - name: Build iOS App Bundle (Physical Device Unsigned)
+        run: |
+          xcodebuild -workspace ios/Runner.xcworkspace \
+                     -scheme Runner \
+                     -configuration Release \
+                     -sdk iphoneos \
+                     -derivedDataPath build/ios \
+                     CODE_SIGNING_ALLOWED=NO \
+                     CODE_SIGNING_REQUIRED=NO \
+                     CODE_SIGN_IDENTITY="" \
+                     PROVISIONING_PROFILE_SPEC=""
 
       - name: Create IPA Package
         run: |
           mkdir -p Payload
-          cp -r build/ios/iphoneos/Runner.app Payload/
+          cp -r build/ios/Build/Products/Release-iphoneos/Runner.app Payload/
           zip -r habitos_ios_app.ipa Payload
+          cd build/ios/iphonesimulator
+          zip -r ../../../habitos_ios_simulator.zip Runner.app
 
-      - name: Upload iOS App Artifact
+      - name: Upload iOS App IPA Artifact
         uses: actions/upload-artifact@v4
         with:
           name: habitos-ios-app
           path: habitos_ios_app.ipa
+
+      - name: Upload iOS Simulator Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: habitos-ios-simulator
+          path: habitos_ios_simulator.zip
